@@ -8,7 +8,7 @@ python:
 env:
   global:
     - DJANGO_SETTINGS_MODULE=estoudebike.settings.travis
-    - PYTHONPATH=src
+    - PYTHONPATH=.
 
 before_install:
   - sudo apt-get update -qq
