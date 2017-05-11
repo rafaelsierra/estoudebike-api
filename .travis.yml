@@ -18,6 +18,6 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - cd src/
+  - cd src/estoudebike
   - pytest --cov=estacionamento --cov=bike_auth
   - flake8 --ignore=E501 bike_auth/ estacionamento/
