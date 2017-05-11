@@ -1,0 +1,8 @@
+psycopg2
+django>=1.11,<1.12
+pillow
+pytest
+pytest-django
+pytest-cov
+flake8
+

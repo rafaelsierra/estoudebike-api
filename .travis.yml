@@ -1,0 +1,23 @@
+language: python
+services:
+  - postgresql
+
+python:
+  - "3.5"
+
+env:
+  global:
+    - DJANGO_SETTINGS_MODULE=estoudebike.settings.travis
+    - PYTHONPATH=src
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libpq-dev
+
+install:
+  - pip install -r src/requirements.txt
+
+script:
+  - cd src/
+  - pytest --cov=estacionamento --cov=bike_auth
+  - flake8 --ignore=E501 bike_auth/ estacionamento/
