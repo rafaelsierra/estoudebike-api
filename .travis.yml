@@ -1,9 +1,10 @@
 language: python
 services:
   - postgresql
+  - memcached
 
 python:
-  - "3.5"
+  - "3.6"
 
 env:
   global:
@@ -19,5 +20,5 @@ install:
 
 script:
   - cd src/estoudebike
-  - pytest --cov=estacionamento --cov=bike_auth
-  - flake8 --ignore=E501 bike_auth/ estacionamento/
+  - pytest --cov=estacionamento --cov=bike_auth --cov=api
+  - flake8 --ignore=E501 bike_auth/ estacionamento/ api/

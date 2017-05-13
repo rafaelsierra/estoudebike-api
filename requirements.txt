@@ -1,8 +1,10 @@
 psycopg2
 django>=1.11,<1.12
+djangorestframework>=3,<4
 pillow
 pytest
 pytest-django
 pytest-cov
+freezegun
 flake8
 
