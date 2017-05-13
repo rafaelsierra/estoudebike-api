@@ -5,18 +5,13 @@ from rest_framework.throttling import AnonRateThrottle
 from bike_auth.models import Token
 
 
-class NovoAcessoBurstThrottle(AnonRateThrottle):
+class NovoAcessoThrottle(AnonRateThrottle):
     rate = '100/hour'
     scope = 'burst'
 
 
-class NovoAcessoDiarioThrottle(AnonRateThrottle):
-    rate = '500/day'
-    scope = 'daily'
-
-
 class NovoAcessoView(generics.CreateAPIView):
-    throttle_classes = (NovoAcessoBurstThrottle, NovoAcessoDiarioThrottle)
+    throttle_classes = (NovoAcessoThrottle, )
 
     def create(request, *args, **kwargs):
         token = Token.objects.create()

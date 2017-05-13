@@ -28,14 +28,4 @@ def test_limite_novo_acesso(client, novo_acesso_uri):
             assert response.status_code == 200
         response = client.post(novo_acesso_uri)
         response.status_code == 429
-
-    # Restricao por dia
-    for hora in range(5):
-        with freeze_time("1986-04-27 0{}:00:00".format(hora)):
-            for x in range(100):
-                response = client.post(novo_acesso_uri)
-                assert response.status_code == 200
-
-    with freeze_time("1986-04-27 05:00:00".format(hora)):
-        response = client.post(novo_acesso_uri)
-        assert response.status_code == 429
+    cache.clear()
