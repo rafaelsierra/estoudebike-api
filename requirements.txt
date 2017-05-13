@@ -7,4 +7,4 @@ pytest-django
 pytest-cov
 freezegun
 flake8
-
+python3-memcached
