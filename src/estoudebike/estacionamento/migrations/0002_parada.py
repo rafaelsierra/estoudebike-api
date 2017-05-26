@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('avaliacao', models.IntegerField(default=0)),
                 ('local', django.contrib.gis.db.models.fields.PointField(srid=4326)),
                 ('comentario', models.TextField(blank=True, null=True)),
-                ('foto', models.ImageField(blank=True, null=True, upload_to='estacionamento/fotos')),
+                ('foto', models.TextField(blank=True, null=True)),
                 ('token', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='paradas', to='bike_auth.Token')),
             ],
         ),
