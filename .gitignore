@@ -1,7 +1,7 @@
 venv
 *.swp
 *.swo
-src/estoudebike/estoudebike/settings/local.py
+src/estoudebike/settings/local.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
