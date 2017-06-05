@@ -19,6 +19,11 @@ class ParadaThrottle(AnonRateThrottle):
     scope = 'burst'
 
 
+class BuscarParadaThrottle(AnonRateThrottle):
+    rate = '5/second'
+    scope = 'burst'
+
+
 class ParadaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     throttle_classes = (ParadaThrottle, )
     serializer_class = ParadaSerializer
@@ -31,7 +36,7 @@ class BuscarParadaPagination(LimitOffsetPagination):
 
 
 class BuscarParadaView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    throttle_classes = (ParadaThrottle, )
+    throttle_classes = (BuscarParadaThrottle, )
     queryset = Parada.objects.all().defer('foto')
     serializer_class = ResultadoBuscaSerializer
     pagination_class = BuscarParadaPagination
