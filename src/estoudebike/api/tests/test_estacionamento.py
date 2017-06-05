@@ -2,9 +2,13 @@ import json
 import pytest
 import uuid
 
+from django.contrib.gis.geos import Point
 from django.urls import reverse
 
 from .test_token import novo_acesso_uri # NOQA
+
+from bike_auth.models import Token
+from estacionamento.models import Parada
 
 pytestmark = pytest.mark.django_db
 
@@ -56,20 +60,17 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z"""
 
 
 @pytest.fixture
-def paradas_iniciais(client, parada_uri, token):
+def paradas_iniciais(client, parada_uri):
     lat = -23.5371
     lng = -46.6401
     avaliacao = 0
     for x in range(0, 115, 2):
         for y in range(0, 83, 2):
-            client.post(
-                parada_uri,
-                json.dumps({
-                    'token': token,
-                    'local': {'lat': lat + (y / 10000.0), 'lng': lng + (x / 10000.0)},
-                    'avaliacao': avaliacao
-                }),
-                content_type="application/json"
+            token = Token.objects.get_or_create()[0]
+            Parada.objects.create(
+                token=token,
+                local=Point(lng + (x / 10000.0), lat + (y / 10000.0)),
+                avaliacao=avaliacao
             )
             avaliacao = avaliacao + 1 if avaliacao <= 5 else 0
 
