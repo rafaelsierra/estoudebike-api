@@ -56,8 +56,32 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z"""
 
 
 @pytest.fixture
+def paradas_iniciais(client, parada_uri, token):
+    lat = -23.5371
+    lng = -46.6401
+    avaliacao = 0
+    for x in range(0, 115, 2):
+        for y in range(0, 83, 2):
+            client.post(
+                parada_uri,
+                json.dumps({
+                    'token': token,
+                    'local': {'lat': lat + (y / 10000.0), 'lng': lng + (x / 10000.0)},
+                    'avaliacao': avaliacao
+                }),
+                content_type="application/json"
+            )
+            avaliacao = avaliacao + 1 if avaliacao <= 5 else 0
+
+
+@pytest.fixture
 def parada_uri():
     return reverse('api:parada')
+
+
+@pytest.fixture
+def buscar_parada_uri():
+    return reverse('api:buscar-parada')
 
 
 @pytest.fixture # NOQA
@@ -138,6 +162,19 @@ def test_latitude_longitude_invalido(client, parada_uri, token):
     assert response.status_code == 400
     assert 'local' in data
 
+    response = client.post(
+        parada_uri,
+        json.dumps({
+            'token': token,
+            'local': {'lat': '10', 'lng': 30},
+            'avaliacao': 4
+        }),
+        content_type="application/json"
+    )
+    data = response.json()
+    assert response.status_code == 400
+    assert 'local' in data
+
     #
     # Longitude invalida
     #
@@ -159,6 +196,19 @@ def test_latitude_longitude_invalido(client, parada_uri, token):
         json.dumps({
             'token': token,
             'local': {'lat': -10, 'lng': -180.005},
+            'avaliacao': 4
+        }),
+        content_type="application/json"
+    )
+    data = response.json()
+    assert response.status_code == 400
+    assert 'local' in data
+
+    response = client.post(
+        parada_uri,
+        json.dumps({
+            'token': token,
+            'local': {'lat': -10, 'lng': '18'},
             'avaliacao': 4
         }),
         content_type="application/json"
@@ -308,3 +358,27 @@ def test_foto_com_base64_invalido_2(client, parada_uri, token):
     data = response.json()
     assert response.status_code == 400
     assert 'foto' in data
+
+
+def test_encontrar_estacionamento(client, buscar_parada_uri, token, paradas_iniciais):
+    luz = {'lat': -23.5329, 'lng': -46.6343}
+    response = client.post(
+        buscar_parada_uri,
+        json.dumps({
+            'local': luz,
+            'token': token,
+        }),
+        content_type="application/json"
+    )
+    data = response.json()
+    assert response.status_code == 200
+    assert 'results' in data
+    assert 'next' in data
+    assert 'previous' in data
+
+    parada = data['results'][0]
+    assert 'distancia' in parada
+    assert 'token' not in parada
+    assert 'local' in parada
+    assert 'lat' in parada['local']
+    assert 'lng' in parada['local']

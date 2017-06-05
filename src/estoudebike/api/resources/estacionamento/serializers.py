@@ -1,5 +1,6 @@
 import base64
 import io
+import numbers
 from PIL import Image
 
 from django.contrib.gis.geos import Point
@@ -15,7 +16,19 @@ class PointFieldAPI(serializers.Field):
         return {'lat': obj.y, 'lng': obj.x}
 
     def to_internal_value(self, data):
+        if not isinstance(data.get('lng', None), numbers.Real):
+            raise serializers.ValidationError(_('Longitude precisa ser um numero real'))
+        if not isinstance(data.get('lat', None), numbers.Real):
+            raise serializers.ValidationError(_('Latitude precisa ser um numero real'))
+
+        if not -180 <= data['lng'] <= 180 or not -90 <= data['lat'] <= 90:
+            raise serializers.ValidationError(_('Local especificado inválido'))
         return Point(data['lng'], data['lat'])
+
+
+class DistanciaFieldAPI(serializers.Field):
+    def to_representation(self, obj):
+        return obj.m
 
 
 class ParadaSerializer(serializers.ModelSerializer):
@@ -35,11 +48,6 @@ class ParadaSerializer(serializers.ModelSerializer):
             'comentario',
             'foto'
         )
-
-    def validate_local(self, local):
-        if not -180 <= local.x <= 180 or not -90 <= local.y <= 90:
-            raise serializers.ValidationError(_('Local especificado inválido'))
-        return local
 
     def validate_avaliacao(self, avaliacao):
         if not 0 <= avaliacao <= 5:
@@ -83,3 +91,22 @@ class ParadaSerializer(serializers.ModelSerializer):
                 im.save(nova_im, 'JPEG', quality=85)
                 foto = nova_im
         return foto
+
+
+class ResultadoBuscaSerializer(ParadaSerializer):
+
+    distancia = DistanciaFieldAPI()
+
+    class Meta(ParadaSerializer.Meta):
+        fields = (
+            'id',
+            'nome',
+            'avaliacao',
+            'local',
+            'comentario',
+            'distancia',
+        )
+
+
+class BuscarEntradaSerializer(serializers.Serializer):
+    local = PointFieldAPI()
